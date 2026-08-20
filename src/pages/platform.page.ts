@@ -43,10 +43,28 @@ export class PlatformPage {
   async openProfileMenu() {
     const frame = this.appFrame();
     const userId = env.user;
-    await frame.locator('div').filter({ hasText: new RegExp(`^${userId}$`) }).nth(2).click();
-    await expect(frame.locator('.icons-language .icon-profile').first()).toBeVisible({
-      timeout: 15_000,
-    });
+    await this.page.keyboard.press('Escape').catch(() => {});
+    await this.page.waitForTimeout(300);
+
+    const candidates = [
+      frame.locator('div').filter({ hasText: new RegExp(`^${userId}$`) }).nth(2),
+      frame.getByText(userId, { exact: true }).first(),
+    ];
+
+    for (const candidate of candidates) {
+      try {
+        await candidate.click({ timeout: 5_000 });
+        await expect(frame.locator('.icons-language .icon-profile').first()).toBeVisible({
+          timeout: 8_000,
+        });
+        return;
+      } catch {
+        await this.page.keyboard.press('Escape').catch(() => {});
+        await this.page.waitForTimeout(300);
+      }
+    }
+
+    throw new Error('Não foi possível abrir o menu de idioma do perfil');
   }
 
   /**
@@ -99,6 +117,11 @@ export class PlatformPage {
       'Panel de Cotizaciones',
       'PANEL DE COTIZACIÓN',
       'LIBRO DE OFERTAS',
+      '报价面板',
+      '报价板',
+      '行情面板',
+      '盘口',
+      '面板',
     ],
   ) {
     const frame = this.appFrame();
@@ -111,27 +134,30 @@ export class PlatformPage {
     const total = await options.count();
 
     const catalogIsOpen = async () => {
-      // Catálogo completo: vários tipos de widget na mesma lista
-      const custody = frame.getByText(/CUST[OÓ]DIA|CUSTODY/i).filter({ visible: true });
-      const news = frame.getByText(/NOT[IÍ]CIAS|NEWS|NOTICIAS/i).filter({ visible: true });
-      const book = frame.getByText(/BOOK DE OFERTAS|ORDER BOOK|LIBRO DE OFERTAS|BOOK OFFERS/i).filter({
-        visible: true,
-      });
-      const orders = frame.getByText(/LISTA DE ORDENS|ORDER LIST|LISTA DE [OÓ]RDENES/i).filter({
-        visible: true,
-      });
-      const visibleCount =
-        Number(await custody.count().then((c) => (c > 0 ? 1 : 0))) +
-        Number(await news.count().then((c) => (c > 0 ? 1 : 0))) +
-        Number(await book.count().then((c) => (c > 0 ? 1 : 0))) +
-        Number(await orders.count().then((c) => (c > 0 ? 1 : 0)));
+      // Catálogo completo: vários tipos de widget financeiro na mesma lista
+      const markers = [
+        frame.getByText(/CUST[OÓ]DIA|CUSTODY|托管/i).filter({ visible: true }),
+        frame.getByText(/NOT[IÍ]CIAS|NEWS|NOTICIAS|新闻/i).filter({ visible: true }),
+        frame
+          .getByText(/BOOK DE OFERTAS|ORDER BOOK|LIBRO DE OFERTAS|BOOK OFFERS|盘口|买卖盘|报价簿|行情面板/i)
+          .filter({ visible: true }),
+        frame
+          .getByText(/LISTA DE ORDENS|ORDER LIST|LISTA DE [OÓ]RDENES|ORDERS LIST|订单|成交/i)
+          .filter({ visible: true }),
+      ];
+      let visibleCount = 0;
+      for (const marker of markers) {
+        if ((await marker.count()) > 0) visibleCount += 1;
+      }
       return visibleCount >= 2;
     };
 
     for (let i = 0; i < total; i++) {
       await options.nth(i).click({ force: true });
 
-      const painelTitle = frame.getByText(/^Painel$|^Panel$|^Widgets$/i).filter({ visible: true });
+      const painelTitle = frame
+        .getByText(/^Painel$|^Panel$|^Widgets$|^面板$/i)
+        .filter({ visible: true });
       try {
         await expect(painelTitle.first()).toBeVisible({ timeout: 4_000 });
       } catch {
@@ -148,9 +174,9 @@ export class PlatformPage {
         }
       }
 
-      // Fallback: qualquer item típico do catálogo
+      // Fallback: qualquer item típico do catálogo financeiro
       const fallback = frame.getByText(
-        /not[ií]cias|news|noticias|ranking|highlights|destaques|cust[oó]dia|custody|book offers|libro de ofertas/i,
+        /not[ií]cias|news|noticias|新闻|ranking|highlights|destaques|cust[oó]dia|custody|托管|book offers|libro de ofertas|盘口|报价|行情面板/i,
       );
       if ((await fallback.count()) > 0) {
         await fallback.first().click({ force: true }).catch(() => {});
@@ -196,7 +222,17 @@ export class PlatformPage {
           break;
         }
       }
-      expect(found, `Widget não traduzido (${language.name}): ${pattern}`).toBeTruthy();
+      if (!found) {
+        // Ajuda a calibrar labels reais do catálogo (ex.: chinês)
+        const body = await frame.locator('body').innerText();
+        const lines = [...new Set(body.split(/\n+/).map((s) => s.trim()).filter(Boolean))];
+        const start = lines.findIndex((l) => /^(Painel|Panel|Widgets|面板)$/i.test(l));
+        const slice = lines.slice(Math.max(0, start), start >= 0 ? start + 30 : 40);
+        expect(
+          found,
+          `Widget não traduzido (${language.name}): ${pattern}\nCatálogo aproximado:\n${slice.join('\n')}`,
+        ).toBeTruthy();
+      }
     }
   }
 

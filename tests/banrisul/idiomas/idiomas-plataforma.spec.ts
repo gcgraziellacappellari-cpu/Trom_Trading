@@ -5,15 +5,18 @@ import { PlatformPage } from '../../../src/pages/platform.page';
 import { zohoNote } from '../../../src/support/zoho';
 
 /**
- * Idiomas DENTRO da plataforma (menu do perfil → bandeiras).
+ * Idiomas DENTRO da plataforma (menu do perfil → cada bandeira).
  * Codegen: clique no usuário → `.icons-language .icon-profile`
+ *
+ * Foco da validação: vocabulário financeiro da bolsa (compra/venda, patrimônio,
+ * book de ofertas, ordens, custódia, widgets do PAINEL, etc.).
  */
 test.describe('Banrisul — Idiomas na plataforma', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
   test.setTimeout(180_000);
 
   for (const language of banrisul.platformLanguages ?? []) {
-    test(`seleciona ${language.name} e valida tradução do menu e widgets`, async ({ page }) => {
+    test(`bandeira ${language.name}: termos financeiros e widgets`, async ({ page }) => {
       const login = new LoginPage(page, banrisul);
       const platform = new PlatformPage(page, banrisul);
 
@@ -27,7 +30,7 @@ test.describe('Banrisul — Idiomas na plataforma', () => {
       zohoNote({
         modulo: 'Banrisul / Idiomas plataforma',
         cenario: language.name,
-        observacao: `Sidebar + dashboard + ${language.painelWidgets.length} widgets do PAINEL`,
+        observacao: `Termos financeiros + ${language.painelWidgets.length} widgets do PAINEL`,
       });
     });
   }
