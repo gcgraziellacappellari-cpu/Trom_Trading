@@ -1,0 +1,30 @@
+{
+  "name": "trom-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Testes E2E Playwright TROM — por corretora",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed --workers=1",
+    "test:debug": "npx playwright test --debug",
+    "test:ui": "npx playwright test --ui",
+    "test:banrisul": "npx playwright test --project=banrisul --project=banrisul-authed",
+    "test:banrisul:login": "npx playwright test tests/banrisul/login --project=banrisul",
+    "test:banrisul:widgets": "npx playwright test tests/banrisul/widgets-corretora --project=banrisul",
+    "test:banrisul:idiomas": "npx playwright test tests/banrisul/idiomas --project=banrisul",
+    "test:banrisul:login:headed": "npx playwright test tests/banrisul/login --project=banrisul --headed --workers=1",
+    "test:banrisul:widgets:headed": "npx playwright test tests/banrisul/widgets-corretora --project=banrisul --headed --workers=1",
+    "test:banrisul:idiomas:headed": "npx playwright test tests/banrisul/idiomas --project=banrisul --headed --workers=1",
+    "auth:banrisul": "npx playwright test tests/auth.setup.ts --project=setup-banrisul",
+    "codegen:banrisul": "npx playwright codegen https://ctdevwebfrontend.cma.com.br/CMA/TROM/TRADING-BANRISUL --load-storage=playwright/.auth/banrisul.json",
+    "codegen:banrisul:login": "npx playwright codegen https://ctdevwebfrontend.cma.com.br/CMA/TROM/TRADING-BANRISUL --save-storage=playwright/.auth/banrisul.json",
+    "report": "npx playwright show-report",
+    "install:browsers": "npx playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
+    "dotenv": "^17.4.2",
+    "typescript": "^7.0.2"
+  }
+}
