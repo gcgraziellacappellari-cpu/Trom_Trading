@@ -12,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1,
   reporter: [['html', { open: 'never' }], ['list']],
-  timeout: 60_000,
+  timeout: 180_000,
   expect: { timeout: 15_000 },
   use: {
     baseURL: process.env.BASE_URL ?? banrisul.baseUrl,

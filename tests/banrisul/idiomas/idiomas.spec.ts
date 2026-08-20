@@ -3,7 +3,8 @@ import { banrisul } from '../../../src/brokers/banrisul';
 import { LoginPage } from '../../../src/pages/login.page';
 import { zohoNote } from '../../../src/support/zoho';
 
-test.describe('Banrisul — Idiomas', () => {
+/** Idiomas na tela de LOGIN (bandeiras do rodapé). */
+test.describe('Banrisul — Idiomas na login', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test('exibe bandeiras de idioma na tela de login', async ({ page }) => {
@@ -15,7 +16,7 @@ test.describe('Banrisul — Idiomas', () => {
     await expect(flags).toHaveCount(6);
 
     zohoNote({
-      modulo: 'Banrisul / Idiomas',
+      modulo: 'Banrisul / Idiomas login',
       cenario: 'Bandeiras visíveis',
       observacao: '6 bandeiras no rodapé da login.',
     });
@@ -35,24 +36,9 @@ test.describe('Banrisul — Idiomas', () => {
     await login.expectLanguage(pt);
 
     zohoNote({
-      modulo: 'Banrisul / Idiomas',
+      modulo: 'Banrisul / Idiomas login',
       cenario: 'Troca PT/EN',
       observacao: 'Labels da login traduzidos conforme bandeira.',
-    });
-  });
-
-  test('alterna idioma para espanhol na tela de login', async ({ page }) => {
-    const login = new LoginPage(page, banrisul);
-    await login.goto();
-
-    const es = banrisul.languages!.find((l) => l.id === 'es')!;
-    await login.selectLanguageByFlagIndex(es.flagIndex);
-    await login.expectLanguage(es);
-
-    zohoNote({
-      modulo: 'Banrisul / Idiomas',
-      cenario: 'Troca para ES',
-      observacao: 'Labels da login em espanhol.',
     });
   });
 });

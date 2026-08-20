@@ -1,7 +1,7 @@
 import type { BrokerConfig } from './types';
 
 /**
- * Corretora Banrisul — URL, nome/logo, widgets do PAINEL e idiomas da tela de login.
+ * Corretora Banrisul — URL, nome/logo, widgets do PAINEL e idiomas.
  */
 export const banrisul: BrokerConfig = {
   id: 'banrisul',
@@ -28,10 +28,6 @@ export const banrisul: BrokerConfig = {
     { id: 'posicao-financeira', label: 'POSIÇÃO FINANCEIRA' },
     { id: 'preco-medio', label: 'PREÇO MÉDIO' },
   ],
-  /**
-   * Bandeiras no rodapé da login (índice da esquerda para a direita).
-   * 0 BR | 1 ES | 2 EN | 3 AR | 4 CO | 5 ZH
-   */
   languages: [
     {
       id: 'pt-BR',
@@ -58,10 +54,93 @@ export const banrisul: BrokerConfig = {
       flagIndex: 1,
       expected: {
         heading: /iniciar sesi[oó]n|entrar/i,
-        user: /usuario|usuario/i,
+        user: /usuario/i,
         password: /contrase[nñ]a|password/i,
         button: /iniciar|entrar|login/i,
       },
+    },
+  ],
+  /**
+   * Idiomas no menu do perfil (após login).
+   * `.icons-language .icon-profile`:
+   * 0 BR (PT) | 1 ES (ES) | 2 UK (UI em ES neste ambiente) | 3 CO | 4 USA (EN) | 5 CN
+   */
+  platformLanguages: [
+    {
+      id: 'pt-BR',
+      iconIndex: 0,
+      name: 'Português',
+      sidebar: [/meus investimentos/i, /configura[cç][oõ]es/i],
+      dashboard: [/comprar/i, /vender/i, /gr[aá]fico/i],
+      painelWidgets: [
+        /painel de cota[cç][oõ]es/i,
+        /gr[aá]fico/i,
+        /book de ofertas/i,
+        /destaques/i,
+        /not[ií]cias/i,
+        /cust[oó]dia/i,
+        /detalhes de cota[cç][aã]o/i,
+        /relat[oó]rio/i,
+        /neg[oó]cios/i,
+        /lista de ordens/i,
+        /produtos/i,
+        /extrato/i,
+        /nota de corretagem/i,
+        /proventos/i,
+        /posi[cç][aã]o financeira/i,
+        /pre[cç]o m[eé]dio/i,
+      ],
+    },
+    {
+      id: 'en',
+      /** Bandeira USA — a UK (índice 2) não aplica EN nesta build. */
+      iconIndex: 4,
+      name: 'English',
+      sidebar: [/dashboard/i, /trading/i, /settings/i],
+      dashboard: [/total portfolio/i, /buy/i, /sell/i, /chart/i],
+      painelWidgets: [
+        /quotes panel/i,
+        /chart/i,
+        /book offers/i,
+        /highlights/i,
+        /news/i,
+        /custody/i,
+        /quote details/i,
+        /report/i,
+        /trades/i,
+        /orders? list/i,
+        /investment panel/i,
+        /extract|statement/i,
+        /brokerage note/i,
+        /proceeds|earnings/i,
+        /financial position/i,
+        /average price/i,
+      ],
+    },
+    {
+      id: 'es',
+      iconIndex: 1,
+      name: 'Español',
+      sidebar: [/mis inversiones/i, /trading/i, /configuraciones/i],
+      dashboard: [/patrimonio total/i, /comprar/i, /vender/i, /gr[aá]fico/i],
+      painelWidgets: [
+        /panel de cotizaci/i,
+        /gr[aá]fico/i,
+        /libro de ofertas/i,
+        /ranking/i,
+        /noticias/i,
+        /custodia/i,
+        /detalles de[l]? cotizaci/i,
+        /reporte/i,
+        /negocios/i,
+        /lista de [oó]rdenes/i,
+        /painel de invest|panel de invest|productos/i,
+        /extracto/i,
+        /nota de corretaje/i,
+        /proventos/i,
+        /posici[oó]n financiera/i,
+        /precio promedio/i,
+      ],
     },
   ],
 };
